@@ -4,16 +4,10 @@ var CLOUD_WIDTH = 420;
 var CLOUD_HEIGHT = 270;
 var CLOUD_X = 100;
 var CLOUD_Y = 10;
-var GAP = 10; // расстояние, на которое выступает тень облака
-var GAP_X = 20; //начальная точка гистограммы по горизонтали. Почему задаем значение 20?
-var GAP_Y = 20; // начальная точка гистограммы по вертикали. Почему задаем значение 20?
-var FONT_GAP = 15; // какое это расстояние?
-var TEXT_HIGHT = 20; //высота, которую занимает текст с учетом высоты строки
-var BAR_GAP = 20; //расстояние между чем???
-var SPACE_GAP = 50; //расстояние между колонками гистограммы
-var BAR_WIDTH = 40; // ширина колонки
-var barHeight = CLOUD_HEIGHT - GAP_Y - FONT_GAP - GAP_Y - CLOUD_Y; //не очень понятно, как рассчитывается
-
+var GAP = 10;
+var SPACE_GAP = 50;
+var BAR_WIDTH = 40;
+var barHeight = 150;
 
 //функция отрисовки облака
 var renderCloud = function(ctx, x, y, color) {
@@ -21,9 +15,7 @@ var renderCloud = function(ctx, x, y, color) {
 	ctx.fillRect(x, y, CLOUD_WIDTH, CLOUD_HEIGHT);
 };
 
-// Находим максимальный результат игрока. Функция создает массив,
-//счетчик перебирает массив результатов и возвращает самый высокий результат.
-//Почему мы не задаем этот массив. Нужно ведь задать пустой массив без значений?
+// Просто функция для расчета максимального элемента
 
 var getMaxElement = function(arr) {
 	var maxElement = arr[0];
@@ -33,9 +25,9 @@ var getMaxElement = function(arr) {
 			maxElement = arr[i];
 		}
 	}
-
 	return maxElement;
 };
+
 
 window.renderStatistics = function(ctx, names, times) {
 	//отрисовка тини и облака. Тень выступает за облако на 10px = GAP
@@ -52,27 +44,35 @@ window.renderStatistics = function(ctx, names, times) {
 
 	ctx.fillText('Ура вы победили!', 310, 20);
 	ctx.fillText('Список результатов:', 310, 50);
+	/*
+		ctx.fillStyle = '#000';
+		ctx.fillText('Вы', CLOUD_X, 100);
+		ctx.fillRect(CLOUD_X, 120, BAR_WIDTH, barHeight);
 
-	// Перебираем массив с именами и присваеваем цвет столбика гистограммы
+		ctx.fillText('Иван', CLOUD_X + SPACE_GAP, 100);
+		ctx.fillRect(CLOUD_X + SPACE_GAP, 120, BAR_WIDTH, barHeight);
 
+		ctx.fillText('Юлия', CLOUD_X + SPACE_GAP * 2, 100);
+		ctx.fillRect(CLOUD_X + SPACE_GAP * 2, 120, BAR_WIDTH, barHeight);
+	*/
 	var maxTime = getMaxElement(times);
 
+	ctx.fillStyle = '#000';
+	var names = ['Вы', 'Иван', 'Юлия'];
+
 	for (var i = 0; i < names.length; i++) {
+		ctx.fillText(names[i], (CLOUD_X) * i, 100);
+		ctx.fillRect((CLOUD_X) * i + SPACE_GAP, 120, BAR_WIDTH, (barHeight * times[i]) / maxTime);
+	}
 
-		if (names[i] === 'Me') {
+
+	// Задаем цвет колонок
+
+	for (var i = 0; i < names.length; i++) {
+		if (names[i] === 'Вы') {
 			ctx.fillStyle = 'rgba(255, 0, 0, 1)';
-		} else if (names[i] === 'Tom') {
-			ctx.fillStyle = 'rgba(43, 89, 158, 1)';
-		} else if (names[i] === 'Jerry') {
-			ctx.fillStyle = 'rgba(40, 87, 128, 1)';
 		} else {
-			ctx.fillStyle = 'rgba(45, 97, 160, 1)';
+			ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
 		}
-		// Вот эту часть нужно подробнее пояснить.
-		ctx.fillText(names[i], CLOUD_X + GAP_X + BAR_GAP + (SPACE_GAP + BAR_WIDTH) * i, CLOUD_Y + GAP_Y + FONT_GAP + barHeight + TEXT_HEIGHT);
-		ctx.fillText(Math.round(times[i]), CLOUD_X + GAP_X + BAR_GAP + (SPACE_GAP + BAR_WIDTH) * i, CLOUD_Y + GAP_Y + FONT_GAP + barHeight - (barHeight * times[i] / maxTime) - CLOUD_Y);
-
-
-		ctx.fillRect(CLOUD_X + GAP_X + BAR_GAP + (SPACE_GAP + BAR_WIDTH) * i, CLOUD_Y + GAP_Y + FONT_GAP + barHeight, BAR_WIDTH, -(barHeight * times[i] / maxTime));
 	}
 };
